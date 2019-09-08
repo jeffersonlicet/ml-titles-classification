@@ -8,10 +8,10 @@ print(tokens.shape)
 dictionary = np.load('./dic.npy', allow_pickle=True)
 print("Max word sequence: ")
 max_sequence = max(len(l) for l in tokens)
-max_sequence_plus = max_sequence + 1
+max_sequence_plus = max_sequence
 print(max_sequence)
 
-vocabulary_size = dictionary.shape[0]
+vocabulary_size = dictionary.shape[0] + 1 # to add nonew
 chunks = np.array_split(tokens, 8)
 
 def _hash(arr):
