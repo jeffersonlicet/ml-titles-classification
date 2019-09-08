@@ -15,7 +15,6 @@ DICTIONARY_OUTPUT_DIR = './dictionary.npy'
 LABELS_OUTPUT_DIR = './labels.npy'
 
 data = pd.read_csv(TRAIN_CSV_DIR)
-#data = data.sample(5)
 print("There are: " + str(data.shape[0]) + " entries in the csv file")
 
 unreliable = data[data['label_quality'] == 'unreliable']
@@ -29,7 +28,6 @@ merged = pd.concat([
 ])
 
 merged = merged.drop('label_quality', axis=1)
-#print(merged.head())
 categories = merged.category.unique()
 categories = np.sort(categories)
 
@@ -48,7 +46,7 @@ def normalize(row):
   dictionary.update(tokens)
   row.title = tokens
   row.category = category
-  
+
   return row
 
 tokens = merged.parallel_apply(normalize, axis=1)
