@@ -4,6 +4,7 @@ from hash import hash_tokens
 from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 tokens = np.load('./titles.npy', allow_pickle=True)
+print(tokens.shape)
 dictionary = np.load('./dic.npy', allow_pickle=True)
 print("Max word sequence: ")
 max_sequence = max(len(l) for l in tokens)
@@ -21,8 +22,8 @@ def _hash(arr):
 
 with Pool(10) as p:
   data = p.map(_hash, chunks)
-  hashed_list =np.squeeze(np.array(data))
+  hashed_list = np.concatenate([data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]])
   #for i in range(8):
   #hashed_list = hashed_list + data[i]
   np.save('./hashed.npy', hashed_list)
-
+  print(hashed_list.shape)
