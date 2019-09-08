@@ -44,7 +44,7 @@ def generator(X_data, y_data, batch_size):
         counter = 0
 
 x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
-print(x[0])
+
 model = keras.models.Sequential()
 model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]), output_dim=output_dim, input_length=hash_list.shape[1], trainable=True))
 model.add(keras.layers.Flatten())
