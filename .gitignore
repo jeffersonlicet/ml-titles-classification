@@ -1,0 +1,9 @@
+train.csv
+test.csv
+__pycache__
+titles.npy
+labels.npy
+dic.npy
+hashed.npy
+test_titles.npy
+categories.npy

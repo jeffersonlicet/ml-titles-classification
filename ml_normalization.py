@@ -2,10 +2,10 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from ml_preprocess_title import preprocess_title
+from utils_preprocess_title import preprocess_title
 from pandarallel import pandarallel
 
-pandarallel.initialize(progress_bar=True, shm_size_mb=int(32e3))
+#pandarallel.initialize(progress_bar=True, shm_size_mb=int(32e3))
 
 TRAIN_CSV_DIR = './train.csv'
 CATEGORIES_OUTPUT_DIR = './categories.npy'
@@ -45,7 +45,7 @@ def normalize(row):
   row.category = category
   return row
 
-tokens = merged.parallel_apply(normalize, axis=1)
+tokens = merged.apply(normalize, axis=1)
 tokens_list = np.squeeze(tokens.iloc[:,0:1].values)
 categories = np.squeeze(tokens.iloc[:,2:3].values)
 

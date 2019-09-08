@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from collections import Counter
-from ml_preprocess_title import preprocess_title
+from utils_preprocess_title import preprocess_title
 from pandarallel import pandarallel
-from hash import hash_tokens
+from utils_hash import hash_tokens
 from keras.preprocessing.sequence import pad_sequences
 
 pandarallel.initialize(progress_bar=True, shm_size_mb=int(2e3))

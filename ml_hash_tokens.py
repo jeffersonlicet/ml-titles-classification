@@ -1,6 +1,6 @@
 import numpy as np
 from multiprocessing import Pool
-from hash import hash_tokens
+from utils_hash import hash_tokens
 from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 
