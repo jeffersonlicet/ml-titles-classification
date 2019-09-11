@@ -1,7 +1,7 @@
 import numpy as np
 from collections import Counter
 from tqdm import tqdm
-titles = np.load('./titles.npy', allow_pickle=True)
+titles = np.load('./titles_normal.npy', allow_pickle=True)
 
 print("Titles")
 print(titles.shape)
@@ -14,8 +14,9 @@ for tokens in tqdm(titles):
 print("Mean by word")
 mean = np.mean([c for k,c in dictionary.items()])
 print(mean)
-
-dictionary_list = [k for k,c in dictionary.items()]
+print("Total words found:")
+print(len(dictionary.items()))
+dictionary_list = [k for k,c in dictionary.items() if c > 1]
 
 print("Total words in dictionary")
 print(len(dictionary_list))

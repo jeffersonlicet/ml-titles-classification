@@ -6,6 +6,10 @@ from tensorflow import set_random_seed
 import random as rn
 import os
 from keras.callbacks import ModelCheckpoint
+from keras.preprocessing.sequence import pad_sequences
+from imblearn.keras import BalancedBatchGenerator
+from imblearn.under_sampling import NearMiss
+from sklearn.utils import class_weight
 
 # Seed to get reproducibility
 os.environ['PYTHONHASHSEED'] = '0'
@@ -19,16 +23,28 @@ hash_list = np.load('./hashed.npy', allow_pickle=True)
 labels = np.load('./labels.npy', allow_pickle=True)
 dictionary = np.load('./dic.npy', allow_pickle=True)
 
+print(hash_list.shape)
+#exit()
+embedding_matrix = np.load('./embeddings/matrix_fast.npy', allow_pickle=True)
+embeddings = np.load('./embeddings/on-dic-fast.pkl', allow_pickle=True)
+print("Vocabulary size: ")
+print(len(dictionary))
+words = list(embeddings.keys())
+print("Total word with embeddings: ")
+print(len(words))
 #hash_list = hash_list[0:100]
 #labels = labels[0:100]
 
-filepath = "./models/2-weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+filepath = "./models/8-weights-improvement.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
-output_dim = 5
+output_dim = 300
 
+print("DATA")
 print(hash_list.shape)
+print(hash_list)
+print(labels)
 print(labels.shape)
 
 def generator(X_data, y_data, batch_size):
@@ -46,14 +62,22 @@ def generator(X_data, y_data, batch_size):
     if counter >= number_of_batches:
         counter = 0
 
-x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
+#x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
+hash_list = pad_sequences(hash_list, maxlen=26, padding='post')
+#x_test = pad_sequences(x_test, maxlen=26, padding='post')
+x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4, stratify=labels)
+class_weights = class_weight.compute_class_weight('balanced',
+                                                 np.unique(y),
+                                                 y)
+print(class_weights)
 print(x.shape)
 print(y.shape)
 print(x[1])
 print(y[1])
 model = keras.models.Sequential()
-model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0] + 1), output_dim=output_dim, input_length=hash_list.shape[1], trainable=True))
+model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0] + 1), weights=[embedding_matrix], output_dim=output_dim, input_length=x.shape[1], trainable=False))
 model.add(keras.layers.Flatten())
+#model.add(keras.layers.Dense(2048, activation='relu'))
 model.add(keras.layers.Dropout(0.5))
 model.add(keras.layers.Dense(1588, activation='softmax'))
 
@@ -61,34 +85,37 @@ model.compile(loss=keras.losses.sparse_categorical_crossentropy, optimizer=keras
 
 print(model.summary())
 BATCH_SIZE = 4000
+#training_generator = BalancedBatchGenerator(hash_list, labels, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
+#validation_generator = BalancedBatchGenerator(x_test, y_test, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 
-train_generator = generator(x, y, BATCH_SIZE)
-validation_generator = generator(x_test, y_test, BATCH_SIZE)
+#training_generator = generator(x, y, BATCH_SIZE)
+#validation_generator = generator(x_test, y_test, BATCH_SIZE)
 
-print("Steps per epoch: ")
-steps_per_epoch = x.shape[0]/BATCH_SIZE
-print(steps_per_epoch)
+#print("Steps per epoch: ")
+#steps_per_epoch = x.shape[0]/BATCH_SIZE
+#print(steps_per_epoch)
 
-print("Validation steps: ")
-validation_steps = x_test.shape[0]/BATCH_SIZE
-print(validation_steps)
-
+#print("Validation steps: ")
+#validation_steps = x_test.shape[0]/BATCH_SIZE
+#print(validation_steps)
 """
 history = model.fit_generator(
-  train_generator,
-  epochs=100,
-  validation_data=validation_generator,
+  training_generator,
+  epochs=10,
+  #validation_data=validation_generator,
   callbacks=callbacks_list,
-  steps_per_epoch=steps_per_epoch,
-  validation_steps=validation_steps,
+  #steps_per_epoch=steps_per_epoch,
+  #validation_steps=validation_steps,
   use_multiprocessing=True,
   workers=4,
 )
 """
-history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list)
-
+#history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list)
 # evaluate
-loss, acc = model.evaluate(x, y)
+#loss, acc = model.evaluate(x, y)
+##print('Train Accuracy: %f' % (acc*100))
+history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=class_weights)
+oss, acc = model.evaluate(x, y)
 print('Train Accuracy: %f' % (acc*100))
 
 loss, acc = model.evaluate(x_test, y_test)

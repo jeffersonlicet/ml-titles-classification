@@ -5,11 +5,11 @@ from tqdm import tqdm
 from utils_preprocess_title import preprocess_title
 from pandarallel import pandarallel
 
-#pandarallel.initialize(progress_bar=True, shm_size_mb=int(32e3))
+pandarallel.initialize(progress_bar=True, shm_size_mb=int(32e3))
 
 TRAIN_CSV_DIR = './train.csv'
 CATEGORIES_OUTPUT_DIR = './categories.npy'
-TITLES_OUTPUT_DIR = './titles.npy'
+TITLES_OUTPUT_DIR = './titles_normal.npy'
 LABELS_OUTPUT_DIR = './labels.npy'
 
 data = pd.read_csv(TRAIN_CSV_DIR)
@@ -45,7 +45,7 @@ def normalize(row):
   row.category = category
   return row
 
-tokens = merged.apply(normalize, axis=1)
+tokens = merged.parallel_apply(normalize, axis=1)
 tokens_list = np.squeeze(tokens.iloc[:,0:1].values)
 categories = np.squeeze(tokens.iloc[:,2:3].values)
 

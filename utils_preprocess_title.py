@@ -51,4 +51,5 @@ def preprocess_title(title, lang):
     stemmer = portugueseSnow
 
   title = [stemmer.stem(token) for token in tokens]
+  #title = tokens
   return title
