@@ -19,9 +19,9 @@ set_random_seed(2)
 
 categories = 1588
 
-hash_list = np.load('./hashed.npy', allow_pickle=True)
-labels = np.load('./labels.npy', allow_pickle=True)
-dictionary = np.load('./dic.npy', allow_pickle=True)
+hash_list = np.load('./output/hashed.npy', allow_pickle=True)
+labels = np.load('./output/labels.npy', allow_pickle=True)
+dictionary = np.load('./output/dictionary.npy', allow_pickle=True)
 
 print(hash_list.shape)
 #exit()
@@ -39,7 +39,7 @@ filepath = "./models/8-weights-improvement.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
-output_dim = 300
+output_dim = 4
 
 print("DATA")
 print(hash_list.shape)
@@ -61,11 +61,11 @@ def generator(X_data, y_data, batch_size):
     #restart counter to yeild data in the next epoch as well
     if counter >= number_of_batches:
         counter = 0
-maxlen = 18
+maxlen = 24
 #x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
 hash_list = pad_sequences(hash_list, maxlen=maxlen, padding='post')
 #x_test = pad_sequences(x_test, maxlen=26, padding='post')
-x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4, stratify=labels)
+x, x_test, y, y_test = train_test_split(hash_list, labels, train_size=0.1, test_size=0.01, random_state=4, stratify=labels)
 class_weights = class_weight.compute_class_weight('balanced',
                                                  np.unique(y),
                                                  y)
@@ -76,7 +76,7 @@ print(y.shape)
 print(x[1])
 print(y[1])
 model = keras.models.Sequential()
-model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]), output_dim=output_dim, input_length=x.shape[1], trainable=True))
+model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]+1), output_dim=output_dim, input_length=x.shape[1], trainable=True))
 model.add(keras.layers.Flatten())
 #model.add(keras.layers.Dense(2048, activation='relu'))
 model.add(keras.layers.Dropout(0.5))

@@ -52,10 +52,29 @@ _grs_alone = r'(\b)grs*(\b)'
 
 remove_digits = str.maketrans('', '', digits)
 
+separators = [
+  '-',
+  'c/',
+  's/',
+  '/',
+  '+',
+  ',',
+  '.',
+  '(',
+  ')',
+  ':',
+  '[',
+  ']',
+  '{',
+  '}',
+]
+
 def preprocess_title(title, lang):
   #print(title)
   title = title.lower()
-  title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
+  #title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
+  for separator in separators:
+    title = title.replace(separator, ' ')
   title = re.sub(regex, "", title)
   title = re.sub(_3D, "medida", title)
   title = re.sub(_2D, "medida", title)
