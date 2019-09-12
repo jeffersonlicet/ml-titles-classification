@@ -3,9 +3,13 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import WordPunctTokenizer
+from string import digits
+
 nltk.download('stopwords')
 
 colors = [
+  'si',
+  'no',
   'rojo',
   'naranja',
   'amarillo',
@@ -37,19 +41,38 @@ portugueseSnow = SnowballStemmer('portuguese')
 
 tokenizer = WordPunctTokenizer()
 regex = r'[^\w\s]'
+nonumber = r'\w*\d\w*'
+
+_3D = r'[0-9]+x[0-9]+x[0-9]+'
+_2D = r'[0-9]+x[0-9]+'
+_mm = r'[0-9]+x[0-9]+'
+_m = r'[0-9]+mm'
+_grs = r'[0-9]+(gr)s*'
+_grs_alone = r'(\b)grs*(\b)'
+
+remove_digits = str.maketrans('', '', digits)
 
 def preprocess_title(title, lang):
+  #print(title)
   title = title.lower()
-  title = title.replace('-', ' ')
-  title = title.replace('/', ' ')
+  title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
   title = re.sub(regex, "", title)
-  title = re.sub(r'(\s|\b)[0-9]+\b', "", title)
-  tokens = [token for token in tokenizer.tokenize(title) if token not in stopwords.words(lang) and len(token) >= 3 and token not in colors]
+  title = re.sub(_3D, "medida", title)
+  title = re.sub(_2D, "medida", title)
+  title = re.sub(_m, "medida", title)
+  title = re.sub(_grs, "gramos", title)
+  title = re.sub(_grs_alone, "gramos", title)
+  title = re.sub(nonumber, "", title)
+  tokens = []
+  for token in tokenizer.tokenize(title):
+    token = token.strip()
+    if token not in stopwords.words(lang) and len(token) >= 2 and token not in colors:
+      tokens.append(token)
 
   stemmer = spanishSnow
   if lang == 'portuguese':
     stemmer = portugueseSnow
 
-  title = [stemmer.stem(token) for token in tokens]
-  #title = tokens
-  return title
+  titleStemmed = [stemmer.stem(token) for token in tokens]
+  return titleStemmed
+

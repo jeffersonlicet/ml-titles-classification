@@ -25,13 +25,13 @@ dictionary = np.load('./dic.npy', allow_pickle=True)
 
 print(hash_list.shape)
 #exit()
-embedding_matrix = np.load('./embeddings/matrix_fast.npy', allow_pickle=True)
-embeddings = np.load('./embeddings/on-dic-fast.pkl', allow_pickle=True)
+#embedding_matrix = np.load('./embeddings/matrix_fast.npy', allow_pickle=True)
+#embeddings = np.load('./embeddings/on-dic-fast.pkl', allow_pickle=True)
 print("Vocabulary size: ")
 print(len(dictionary))
-words = list(embeddings.keys())
-print("Total word with embeddings: ")
-print(len(words))
+#words = list(embeddings.keys())
+#print("Total word with embeddings: ")
+#print(len(words))
 #hash_list = hash_list[0:100]
 #labels = labels[0:100]
 
@@ -61,21 +61,22 @@ def generator(X_data, y_data, batch_size):
     #restart counter to yeild data in the next epoch as well
     if counter >= number_of_batches:
         counter = 0
-
+maxlen = 18
 #x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
-hash_list = pad_sequences(hash_list, maxlen=26, padding='post')
+hash_list = pad_sequences(hash_list, maxlen=maxlen, padding='post')
 #x_test = pad_sequences(x_test, maxlen=26, padding='post')
 x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4, stratify=labels)
 class_weights = class_weight.compute_class_weight('balanced',
                                                  np.unique(y),
                                                  y)
+print("Class weights: ")
 print(class_weights)
 print(x.shape)
 print(y.shape)
 print(x[1])
 print(y[1])
 model = keras.models.Sequential()
-model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0] + 1), weights=[embedding_matrix], output_dim=output_dim, input_length=x.shape[1], trainable=False))
+model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]), output_dim=output_dim, input_length=x.shape[1], trainable=True))
 model.add(keras.layers.Flatten())
 #model.add(keras.layers.Dense(2048, activation='relu'))
 model.add(keras.layers.Dropout(0.5))

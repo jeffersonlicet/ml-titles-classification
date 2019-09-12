@@ -5,14 +5,17 @@ import csv
 from multiprocessing import Pool
 from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
-MODEL = '300-weights-improvement-04-0.87.hdf5'
+MODEL = '8-weights-improvement.hdf5'
 
 test = np.load('./test_titles.npy', allow_pickle=True)
 categories = np.load('./categories.npy', allow_pickle=True)
 
 print("Total test items")
 print(test.shape)
-
+print(test[0])
+print(test[1])
+print(test[9:15])
+exit()
 chunks = np.array_split(test, 8)
 
 

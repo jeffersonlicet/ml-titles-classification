@@ -24,7 +24,7 @@ print("Items are sorted: " + str(must_sum == total_sum))
 
 hashed = np.load('./hashed.npy', allow_pickle=True)
 
-max_sequence = hashed.shape[1]
+max_sequence = 18
 print("Max sequence")
 print(max_sequence)
 
@@ -37,13 +37,7 @@ tokens_list = []
 
 def normalize(row):
   tokens = preprocess_title(row.title, row.language)
-  filtered = []
-  for token in tokens:
-    if token in dictionary:
-      filtered.append(token)
-    else:
-      filtered.append(UNDEFINED_WORD)
-  filtered = hash_tokens(filtered, vocabulary_size)
+  filtered = hash_tokens(tokens, vocabulary_size)
   row.title = filtered
   return row
 
@@ -56,3 +50,4 @@ tokens_list = pad_sequences(tokens_list, maxlen=max_sequence, padding='post')
 np.save('./test_titles.npy', tokens_list)
 
 print(tokens_list.shape)
+print(tokens_list)
