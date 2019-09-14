@@ -10,7 +10,23 @@ from keras.preprocessing.sequence import pad_sequences
 from imblearn.keras import BalancedBatchGenerator
 from imblearn.under_sampling import NearMiss
 from sklearn.utils import class_weight
+from keras import backend as K
+def recall_m(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
 
+def precision_m(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+def f1_m(y_true, y_pred):
+    precision = precision_m(y_true, y_pred)
+    recall = recall_m(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
 # Seed to get reproducibility
 os.environ['PYTHONHASHSEED'] = '0'
 np.random.seed(42)
@@ -39,7 +55,7 @@ filepath = "./models/8-weights-improvement.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
-output_dim = 4
+output_dim = 250
 
 print("DATA")
 print(hash_list.shape)
@@ -65,7 +81,7 @@ maxlen = 24
 #x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.2, random_state=4)
 hash_list = pad_sequences(hash_list, maxlen=maxlen, padding='post')
 #x_test = pad_sequences(x_test, maxlen=26, padding='post')
-x, x_test, y, y_test = train_test_split(hash_list, labels, train_size=0.1, test_size=0.01, random_state=4, stratify=labels)
+x, x_test, y, y_test = train_test_split(hash_list, labels, test_size=0.1, random_state=4, stratify=labels)
 class_weights = class_weight.compute_class_weight('balanced',
                                                  np.unique(y),
                                                  y)
@@ -76,7 +92,7 @@ print(y.shape)
 print(x[1])
 print(y[1])
 model = keras.models.Sequential()
-model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]+1), output_dim=output_dim, input_length=x.shape[1], trainable=True))
+model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]+3), output_dim=output_dim, input_length=x.shape[1], trainable=True))
 model.add(keras.layers.Flatten())
 #model.add(keras.layers.Dense(2048, activation='relu'))
 model.add(keras.layers.Dropout(0.5))
@@ -85,7 +101,7 @@ model.add(keras.layers.Dense(1588, activation='softmax'))
 model.compile(loss=keras.losses.sparse_categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
 print(model.summary())
-BATCH_SIZE = 4000
+BATCH_SIZE = 100000
 #training_generator = BalancedBatchGenerator(hash_list, labels, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 #validation_generator = BalancedBatchGenerator(x_test, y_test, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 
@@ -115,8 +131,8 @@ history = model.fit_generator(
 # evaluate
 #loss, acc = model.evaluate(x, y)
 ##print('Train Accuracy: %f' % (acc*100))
-history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=class_weights)
-oss, acc = model.evaluate(x, y)
+history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=dict(enumerate(class_weights)), )
+loss, acc = model.evaluate(x, y)
 print('Train Accuracy: %f' % (acc*100))
 
 loss, acc = model.evaluate(x_test, y_test)
