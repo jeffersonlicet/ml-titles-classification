@@ -55,7 +55,7 @@ filepath = "./models/8-weights-improvement.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
-output_dim = 250
+output_dim = 300
 
 print("DATA")
 print(hash_list.shape)
@@ -101,7 +101,7 @@ model.add(keras.layers.Dense(1588, activation='softmax'))
 model.compile(loss=keras.losses.sparse_categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
 print(model.summary())
-BATCH_SIZE = 100000
+BATCH_SIZE = 5000
 #training_generator = BalancedBatchGenerator(hash_list, labels, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 #validation_generator = BalancedBatchGenerator(x_test, y_test, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 
@@ -131,7 +131,7 @@ history = model.fit_generator(
 # evaluate
 #loss, acc = model.evaluate(x, y)
 ##print('Train Accuracy: %f' % (acc*100))
-history = model.fit(x, y, epochs=100, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=dict(enumerate(class_weights)), )
+history = model.fit(x, y, epochs=5, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=dict(enumerate(class_weights)), )
 loss, acc = model.evaluate(x, y)
 print('Train Accuracy: %f' % (acc*100))
 
