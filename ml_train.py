@@ -51,7 +51,7 @@ print(len(dictionary))
 #hash_list = hash_list[0:100]
 #labels = labels[0:100]
 
-filepath = "./models/8-weights-improvement.hdf5"
+filepath = "./models/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=2, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
@@ -95,13 +95,13 @@ model = keras.models.Sequential()
 model.add(keras.layers.Embedding(input_dim=(dictionary.shape[0]+3), output_dim=output_dim, input_length=x.shape[1], trainable=True))
 model.add(keras.layers.Flatten())
 #model.add(keras.layers.Dense(2048, activation='relu'))
-model.add(keras.layers.Dropout(0.5))
+model.add(keras.layers.Dropout(0.6))
 model.add(keras.layers.Dense(1588, activation='softmax'))
 
 model.compile(loss=keras.losses.sparse_categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
 
 print(model.summary())
-BATCH_SIZE = 5000
+BATCH_SIZE = 3000
 #training_generator = BalancedBatchGenerator(hash_list, labels, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 #validation_generator = BalancedBatchGenerator(x_test, y_test, sampler=NearMiss(), batch_size=BATCH_SIZE, random_state=42)
 
@@ -131,7 +131,7 @@ history = model.fit_generator(
 # evaluate
 #loss, acc = model.evaluate(x, y)
 ##print('Train Accuracy: %f' % (acc*100))
-history = model.fit(x, y, epochs=5, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=dict(enumerate(class_weights)), )
+history = model.fit(x, y, epochs=6, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=callbacks_list, class_weight=dict(enumerate(class_weights)), )
 loss, acc = model.evaluate(x, y)
 print('Train Accuracy: %f' % (acc*100))
 
