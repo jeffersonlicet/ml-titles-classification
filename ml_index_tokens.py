@@ -4,10 +4,10 @@ from utils_hash import hash_tokens
 from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 
-tokens = np.load('./output_big/titles_normal.npy', allow_pickle=True)
+tokens = np.load('./output_extra/titles_normal.npy', allow_pickle=True)
 
 #tokens = tokens[0:30]
-dictionary = np.load('./output_big/dictionary.npy', allow_pickle=True)
+dictionary = np.load('./output_extra/dictionary.npy', allow_pickle=True)
 
 print("Max word sequence: ")
 max_sequence = max(len(l) for l in tokens)
@@ -25,7 +25,7 @@ def _hash(arr):
     #items = [token for token in item if token in dictionary]
     #print(items)
     #hashed_list.append(hash_tokens(item, vocabulary_size))
-    hashed_list.append([(dic_list.index(token) + 1) if token in dic_list else (len(dic_list) + 2) for token in item])
+    hashed_list.append([(dic_list.index(token) + 1) for token in item])
   #return pad_sequences(hashed_list, maxlen=max_sequence, padding='post')
   return hashed_list
 with Pool(8) as p:
