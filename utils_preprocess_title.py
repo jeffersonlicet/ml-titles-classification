@@ -77,7 +77,8 @@ def preprocess_title(title, lang):
   #title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
   for separator in separators:
     title = title.replace(separator, ' ')
-  title = re.sub(regex, "", title)
+  #title = re.sub(regex, "", title)
+
   #title = re.sub(_3D, "medida", title)
   #title = re.sub(_2D, "medida", title)
   #title = re.sub(_m, "medida", title)
@@ -94,6 +95,19 @@ def preprocess_title(title, lang):
 
   """
   token = token.strip()
+
+  # Comment here to generate large
+  title = re.sub(_3D, "medida", title)
+  title = re.sub(_2D, "medida", title)
+  title = re.sub(_m, "medida", title)
+  title = re.sub(_grs, "gramos", title)
+  title = re.sub(_grs_alone, "gramos", title)
+  title = re.sub(nonumber, "", title)
+  # Comment to here to generate large
+  tokens = []
+  for token in tokenizer.tokenize(title):
+    token = token.strip()
+
     if token not in stopwords.words(lang) and len(token) >= 2 and token not in colors:
       tokens.append(token)
 
