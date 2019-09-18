@@ -8,9 +8,9 @@ from pandarallel import pandarallel
 pandarallel.initialize(progress_bar=True, shm_size_mb=int(30e3))
 
 TRAIN_CSV_DIR = './data/train.csv'
-CATEGORIES_OUTPUT_DIR = './output/categories.npy'
-TITLES_OUTPUT_DIR = './output/titles_normal.npy'
-LABELS_OUTPUT_DIR = './output/labels.npy'
+CATEGORIES_OUTPUT_DIR = './output_extra/categories.npy'
+TITLES_OUTPUT_DIR = './output_extra/titles_normal.npy'
+LABELS_OUTPUT_DIR = './output_extra/labels.npy'
 
 data = pd.read_csv(TRAIN_CSV_DIR)
 #data = data.sample(100)
@@ -44,7 +44,6 @@ def normalize(row):
   #print(row.title)
   tokens = preprocess_title(row.title, row.language)
   category = categories_list.index(row.category)
-  categories.append(category)
   row.title = tokens
   #print(row.title)
   row.category = category

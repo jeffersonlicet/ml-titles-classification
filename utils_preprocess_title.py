@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import WordPunctTokenizer
 from string import digits
+import unicodedata
 
 nltk.download('stopwords')
 
@@ -72,19 +73,27 @@ separators = [
 def preprocess_title(title, lang):
   #print(title)
   title = title.lower()
+  title = unicodedata.normalize('NFKD', title).encode('ASCII', 'ignore').decode('utf8')
   #title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
   for separator in separators:
     title = title.replace(separator, ' ')
   title = re.sub(regex, "", title)
-  title = re.sub(_3D, "medida", title)
-  title = re.sub(_2D, "medida", title)
-  title = re.sub(_m, "medida", title)
-  title = re.sub(_grs, "gramos", title)
-  title = re.sub(_grs_alone, "gramos", title)
-  title = re.sub(nonumber, "", title)
-  tokens = []
-  for token in tokenizer.tokenize(title):
-    token = token.strip()
+  #title = re.sub(_3D, "medida", title)
+  #title = re.sub(_2D, "medida", title)
+  #title = re.sub(_m, "medida", title)
+  #title = re.sub(_grs, "gramos", title)
+  #title = re.sub(_grs_alone, "gramos", title)
+  #title = re.sub(nonumber, "", title)
+  #tokens = []
+  tokens = tokenizer.tokenize(title)
+  stemmer = spanishSnow
+  if lang == 'portuguese':
+    stemmer = portugueseSnow
+
+  return [stemmer.stem(token) for token in tokens]
+
+  """
+  token = token.strip()
     if token not in stopwords.words(lang) and len(token) >= 2 and token not in colors:
       tokens.append(token)
 
@@ -94,4 +103,4 @@ def preprocess_title(title, lang):
 
   titleStemmed = [stemmer.stem(token) for token in tokens]
   return titleStemmed
-
+  """
