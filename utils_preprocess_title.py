@@ -76,12 +76,14 @@ def preprocess_title(title, lang):
   for separator in separators:
     title = title.replace(separator, ' ')
   title = re.sub(regex, "", title)
+  # Comment here to generate large
   title = re.sub(_3D, "medida", title)
   title = re.sub(_2D, "medida", title)
   title = re.sub(_m, "medida", title)
   title = re.sub(_grs, "gramos", title)
   title = re.sub(_grs_alone, "gramos", title)
   title = re.sub(nonumber, "", title)
+  # Comment to here to generate large
   tokens = []
   for token in tokenizer.tokenize(title):
     token = token.strip()
