@@ -31,7 +31,7 @@ def _hash(arr):
 with Pool(8) as p:
   data = p.map(_hash, chunks)
   hashed_list = np.concatenate([data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]])
-  np.save('./output_big/hashed.npy', hashed_list)
+  np.save('./output_extra/hashed.npy', hashed_list)
   print(hashed_list.shape)
   print(hashed_list[0])
 
