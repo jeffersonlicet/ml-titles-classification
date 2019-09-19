@@ -50,14 +50,15 @@ _mm = r'[0-9]+x[0-9]+'
 _m = r'[0-9]+mm'
 _grs = r'[0-9]+(gr)s*'
 _grs_alone = r'(\b)grs*(\b)'
-
+_with = r'(\b)c\/'
+_without = r'(\b)s\/'
 remove_digits = str.maketrans('', '', digits)
 
 separators = [
   '-',
-  'c/',
-  's/',
-  '/',
+ # 'c/',
+ # 's/',
+ # '/',
   '+',
   ',',
   '.',
@@ -69,7 +70,8 @@ separators = [
   '{',
   '}',
 ]
-
+_com = r'(\b)com(\b)'
+_sem = r'(\b)sem(\b)'
 def preprocess_title(title, lang):
   #print(title)
   title = title.lower()
@@ -77,10 +79,14 @@ def preprocess_title(title, lang):
   #title = title.replace('-', ' ').replace('c/', ' ').replace('s/', ' ').replace('/', ' ').replace('+', ' ').replace(',', ' ').replace('.', ' ').replace('(', ' ').replace(')', ' ')
   for separator in separators:
     title = title.replace(separator, ' ')
-  #title = re.sub(regex, "", title)
 
-  #title = re.sub(_3D, "medida", title)
-  #title = re.sub(_2D, "medida", title)
+  title = re.sub(_with, "con ", title)
+  title = re.sub(_without, "sin ", title)
+  title = re.sub(_com, "con ", title)
+  title = re.sub(_sem, "sin ", title)
+  title = re.sub(regex, " ", title)
+
+ #title = re.sub(_2D, "medida", title)
   #title = re.sub(_m, "medida", title)
   #title = re.sub(_grs, "gramos", title)
   #title = re.sub(_grs_alone, "gramos", title)

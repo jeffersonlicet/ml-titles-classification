@@ -12,7 +12,7 @@ pandarallel.initialize(progress_bar=True, shm_size_mb=int(2e3))
 
 UNDEFINED_WORD = 'undefinedword'
 TEST_CSV_DIR = './data/test.csv'
-DICTIONARY_OUTPUT_DIR = './output_big/dictionary.npy'
+DICTIONARY_OUTPUT_DIR = './output_smart/dictionary.npy'
 
 data = pd.read_csv(TEST_CSV_DIR)
 #data = data.sample(10)
@@ -49,7 +49,7 @@ tokens = data.parallel_apply(normalize, axis=1)
 tokens_list = np.squeeze(tokens.iloc[:,1:2].values)
 tokens_list = pad_sequences(tokens_list, maxlen=max_sequence, padding='post')
 
-np.save('./output_big/test_titles.npy', tokens_list)
+np.save('./output_smart/test_titles.npy', tokens_list)
 
 print(tokens_list.shape)
 print(tokens_list)
