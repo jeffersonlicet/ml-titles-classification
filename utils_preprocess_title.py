@@ -50,7 +50,8 @@ def preprocess_title(title, lang):
 
   tokens = tokenizer.tokenize(title)
   stemmer = spanishSnow
+
   if lang == 'portuguese':
     stemmer = portugueseSnow
 
-  return [stemmer.stem(token) for token in tokens if len(token) > 1]
+  return [stemmer.stem(token) for token in tokens if len(token) > 1 and token not in stopwords.words(lang)]
