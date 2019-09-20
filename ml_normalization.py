@@ -8,9 +8,9 @@ from pandarallel import pandarallel
 pandarallel.initialize(progress_bar=True, shm_size_mb=int(30e3))
 
 TRAIN_CSV_DIR = './data/train.csv'
-CATEGORIES_OUTPUT_DIR = './output_smart/categories.npy'
-TITLES_OUTPUT_DIR = './output_smart/titles_normal.npy'
-LABELS_OUTPUT_DIR = './output_smart/labels.npy'
+CATEGORIES_OUTPUT_DIR = './output_beta/categories.npy'
+TITLES_OUTPUT_DIR = './output_beta/titles_normal.npy'
+LABELS_OUTPUT_DIR = './output_beta/labels.npy'
 
 data = pd.read_csv(TRAIN_CSV_DIR)
 #data = data.sample(100)
