@@ -16,6 +16,7 @@ print(max_sequence)
 vocabulary_size = dictionary.shape[0] + 1
 chunks = np.array_split(tokens, WORKERS)
 dic_list = list(dictionary)
+dictOfWords = { word : i for i, word in enumerate(dic_list) }
 
 def _hash(arr):
   hashed_list = []
@@ -23,7 +24,7 @@ def _hash(arr):
     _list = []
     for token in item:
       try:
-        _list.append((dic_list.index(token) + 1))
+        _list.append((dictOfWords.get(token, -1) + 1))
       except:
         _list.append(0)
     hashed_list.append(_list)
