@@ -3,9 +3,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from utils_preprocess_title import preprocess_title
-from pandarallel import pandarallel
-
-pandarallel.initialize(progress_bar=True, shm_size_mb=int(40e3))
+from multiprocessing import  Pool
+import multiprocessing
 
 TRAIN_CSV_DIR = './data/train.csv'
 CATEGORIES_OUTPUT_DIR = './output/categories.npy'
@@ -46,7 +45,17 @@ def normalize(row):
   row.category = category
   return row
 
-tokens = merged.parallel_apply(normalize, axis=1)
+def normalize_chunk(data):
+  return data.apply(normalize, axis=1)
+
+def norm(dataframe):
+  WORKERS = multiprocessing.cpu_count()
+  with Pool(WORKERS) as p:
+    df_split = np.array_split(dataframe, WORKERS)
+    df = pd.concat(p.map(normalize_chunk, df_split))
+    return df
+
+tokens = filtered = norm(merged)
 tokens = tokens[tokens.title.str.len() != 0]
 
 tokens_list = np.squeeze(tokens.iloc[:,0:1].values)
@@ -57,3 +66,5 @@ print("The titles are now normalized")
 
 np.save(LABELS_OUTPUT_DIR, categories)
 print("The labels are now separated")
+
+print(tokens_list[0:10])
