@@ -46,7 +46,8 @@ def normalize(row):
   return row
 
 def normalize_chunk(data):
-  return data.apply(normalize, axis=1)
+  tqdm.pandas()
+  return data.progress_apply(normalize, axis=1)
 
 def norm(dataframe):
   WORKERS = multiprocessing.cpu_count()
