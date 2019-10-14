@@ -1,57 +1,36 @@
 import re
+import sys
 import nltk
+import unicodedata
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import WordPunctTokenizer
-from string import digits
-import unicodedata
 
 nltk.download('stopwords')
 
-spanishSnow = SnowballStemmer('spanish')
-portugueseSnow = SnowballStemmer('portuguese')
+spanish_snow = SnowballStemmer('spanish')
+portuguese_snow = SnowballStemmer('portuguese')
 
 tokenizer = WordPunctTokenizer()
-regex = r'[^\w\s]'
-nonumber = r'\w*\d\w*'
+remove_puntuaction = r'[^\w\s]'
+numbers_regex = r'(\b)[0-9]+(\b)'
 
-_with = r'(\b)c\/'
-_without = r'(\b)s\/'
-_com = r'(\b)com(\b)'
-_sem = r'(\b)sem(\b)'
-numb = r'(\b)[0-9]*(\b)'
-
-separators = [
-  '-',
-  '+',
-  ',',
-  '.',
-  '(',
-  ')',
-  ':',
-  '[',
-  ']',
-  '{',
-  '}',
-]
+separators = ['-', '+', ',', '.', '(', ')', ':', '[', ']', '{', '}', '_', '/']
 
 def preprocess_title(title, lang):
   title = title.lower()
   title = unicodedata.normalize('NFKD', title).encode('ASCII', 'ignore').decode('utf8')
+
   for separator in separators:
     title = title.replace(separator, ' ')
 
-  title = re.sub(_with, "con ", title)
-  title = re.sub(_without, "sin ", title)
-  title = re.sub(_com, "con ", title)
-  title = re.sub(_sem, "sin ", title)
-  title = re.sub(regex, " ", title)
-  title = re.sub(numb, " ", title)
+  title = re.sub(remove_puntuaction, "", title)
+  title = re.sub(numbers_regex, "", title)
 
   tokens = tokenizer.tokenize(title)
-  stemmer = spanishSnow
+  stemmer = spanish_snow
 
   if lang == 'portuguese':
-    stemmer = portugueseSnow
+    stemmer = portuguese_snow
 
-  return [stemmer.stem(token) for token in tokens if len(token) > 1 and token not in stopwords.words(lang)]
+  return [stemmer.stem(token) for token in tokens if token not in stopwords.words(lang) and len(token) > 1]

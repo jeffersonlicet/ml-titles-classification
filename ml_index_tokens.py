@@ -1,8 +1,8 @@
+
 import numpy as np
-from multiprocessing import Pool
-from utils_hash import hash_tokens
-from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
+from multiprocessing import Pool
+from keras.preprocessing.sequence import pad_sequences
 
 tokens = np.load('./output/titles_normal.npy', allow_pickle=True)
 dictionary = np.load('./output/dictionary.npy', allow_pickle=True)
@@ -29,13 +29,12 @@ def _hash(arr):
         _list.append(0)
     hashed_list.append(_list)
   return hashed_list
+
 with Pool(WORKERS) as p:
   data = p.map(_hash, chunks)
   hashed_list = data[0]
   for i in range(1, WORKERS):
     hashed_list = np.concatenate([hashed_list, data[i]])
   np.save('./output/hashed.npy', hashed_list)
-  print(hashed_list.shape)
-  print(hashed_list[0])
 
 
